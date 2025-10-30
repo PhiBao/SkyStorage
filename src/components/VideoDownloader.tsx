@@ -43,6 +43,12 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
   const [error, setError] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [benchmarkStats, setBenchmarkStats] = useState<{
+    downloadTime?: number;
+    uploadTime?: number;
+    totalTime?: number;
+    fileSize?: number;
+  } | null>(null);
 
   const isValidYouTubeUrl = (url: string) => {
     const youtubeRegex = /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
@@ -99,6 +105,11 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
     setIsLoading(true);
     setStep("downloading");
     setProgress(10);
+    setBenchmarkStats(null);
+
+    const totalStartTime = performance.now();
+    let downloadTime = 0;
+    let uploadTime = 0;
 
     try {
       // First get video info
@@ -117,7 +128,8 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
       setVideoInfo(infoData.videoInfo);
       setProgress(30);
 
-      // Download the video
+      // Download the video - Start timing
+      const downloadStartTime = performance.now();
       const downloadResponse = await fetch("/api/download", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -130,6 +142,9 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
         throw new Error(downloadData.error || "Failed to download video");
       }
 
+      const downloadEndTime = performance.now();
+      downloadTime = (downloadEndTime - downloadStartTime) / 1000; // Convert to seconds
+
       setDownloadInfo(downloadData.downloadInfo);
       setProgress(70);
       
@@ -137,6 +152,7 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
       setStep("uploading");
       
       // Read the file from the API
+      const uploadStartTime = performance.now();
       const fileResponse = await fetch(`/api/get-file?filepath=${encodeURIComponent(downloadData.downloadInfo.filepath)}`);
       if (!fileResponse.ok) {
         throw new Error("Failed to read downloaded file");
@@ -152,6 +168,20 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
         downloadData.downloadInfo.filename,
         30 // 30 days expiration
       );
+      
+      const uploadEndTime = performance.now();
+      uploadTime = (uploadEndTime - uploadStartTime) / 1000; // Convert to seconds
+
+      const totalEndTime = performance.now();
+      const totalTime = (totalEndTime - totalStartTime) / 1000; // Convert to seconds
+
+      // Set benchmark stats
+      setBenchmarkStats({
+        downloadTime,
+        uploadTime,
+        totalTime,
+        fileSize: downloadData.downloadInfo.size,
+      });
       
       setUploadedUrl(uploadResult.url);
       setTransactionHash(uploadResult.transactionHash || null);
@@ -175,6 +205,7 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
     setVideoInfo(null);
     setDownloadInfo(null);
     setError(null);
+    setBenchmarkStats(null);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -318,11 +349,54 @@ export function VideoDownloader({ onUploadSuccess }: VideoDownloaderProps) {
                 <p className="text-xs text-gray-400 mt-2">
                   Stored locally as: {downloadInfo.filename}
                 </p>
-                <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                  ⚠️ Not on Shelby blockchain yet - Shelby SDK integration pending
-                </p>
               </div>
             </div>
+
+            {benchmarkStats && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Performance Metrics
+                </h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">YouTube Download</p>
+                    <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                      {benchmarkStats.downloadTime?.toFixed(2) || 0}s
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Shelby Upload</p>
+                    <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                      {benchmarkStats.uploadTime?.toFixed(2) || 0}s
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Total Time</p>
+                    <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                      {benchmarkStats.totalTime?.toFixed(2) || 0}s
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">File Size</p>
+                    <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                      {formatFileSize(benchmarkStats.fileSize || 0)}
+                    </p>
+                  </div>
+                  <div className="col-span-2 pt-2 border-t border-blue-200 dark:border-blue-700">
+                    <p className="text-gray-600 dark:text-gray-400">Upload Speed</p>
+                    <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                      {(((benchmarkStats.fileSize || 0) / (benchmarkStats.uploadTime || 1)) / (1024 * 1024)).toFixed(2)} MB/s
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      ⚡ Typical AWS S3: 5-25 MB/s • Azure Blob: 10-30 MB/s
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <Button onClick={handleReset} variant="outline" className="flex-1">

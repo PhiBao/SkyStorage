@@ -101,13 +101,34 @@ export const useUploadToShelby = (): UseUploadToShelbyReturn => {
         // Step 4: Upload blob data
         const shelbyClient = getShelbyClient();
         
-        await shelbyClient.rpc.putBlob({
-          account: AccountAddress.fromString(account),
-          blobName,
-          blobData: fileData,
-        });
+        try {
+          await shelbyClient.rpc.putBlob({
+            account: AccountAddress.fromString(account),
+            blobName,
+            blobData: fileData,
+          });
 
-        console.log('✅ Upload complete!');
+          console.log('✅ Upload complete!');
+        } catch (uploadError: any) {
+          console.error('❌ Shelby upload error:', uploadError);
+          
+          // Check if it's a server error (500) vs client error (400)
+          if (uploadError?.message?.includes('500')) {
+            throw new Error(
+              'Shelby network is experiencing issues. Your video was registered on the blockchain, but the upload failed. ' +
+              'Please try again in a few minutes. Transaction: ' + txResponse.hash
+            );
+          } else if (uploadError?.message?.includes('413') || uploadError?.message?.includes('too large')) {
+            throw new Error(
+              'File size exceeds Shelby network limits. Try a smaller video or lower quality.'
+            );
+          } else {
+            throw new Error(
+              `Upload to Shelby network failed: ${uploadError?.message || 'Unknown error'}. ` +
+              `Transaction was successful: ${txResponse.hash}`
+            );
+          }
+        }
 
         // Ensure account has 0x prefix for the URL
         const formattedAccount = account.startsWith('0x') ? account : `0x${account}`;

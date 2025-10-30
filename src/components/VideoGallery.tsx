@@ -26,6 +26,12 @@ export function VideoGallery({ refreshTrigger }: VideoGalleryProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
+  const [downloadStats, setDownloadStats] = useState<{
+    videoName: string;
+    downloadTime: number;
+    fileSize: number;
+    downloadSpeed: number;
+  } | null>(null);
 
   const fetchVideos = async () => {
     if (!account) {
@@ -204,7 +210,38 @@ export function VideoGallery({ refreshTrigger }: VideoGalleryProps) {
                       size="sm"
                       variant="outline"
                       className="flex-1 text-xs"
-                      onClick={() => window.open(video.downloadUrl, "_blank")}
+                      onClick={async () => {
+                        const startTime = performance.now();
+                        try {
+                          const response = await fetch(video.downloadUrl);
+                          if (!response.ok) throw new Error('Download failed');
+                          const blob = await response.blob();
+                          const endTime = performance.now();
+                          const downloadTime = (endTime - startTime) / 1000;
+                          const downloadSpeed = (video.size / downloadTime) / (1024 * 1024);
+                          
+                          setDownloadStats({
+                            videoName: video.name,
+                            downloadTime,
+                            fileSize: video.size,
+                            downloadSpeed,
+                          });
+
+                          // Trigger browser download
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = video.name;
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          document.body.removeChild(a);
+                        } catch (err) {
+                          console.error('Download error:', err);
+                          // Fallback to opening in new tab
+                          window.open(video.downloadUrl, "_blank");
+                        }
+                      }}
                       disabled={video.isExpired}
                     >
                       <Download className="w-3 h-3 mr-1" />
@@ -256,6 +293,80 @@ export function VideoGallery({ refreshTrigger }: VideoGalleryProps) {
               >
                 Your browser does not support the video tag.
               </video>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download Stats Modal */}
+      {downloadStats && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setDownloadStats(null)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-900 rounded-lg max-w-2xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Download Complete!
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDownloadStats(null)}
+                >
+                  Close
+                </Button>
+              </div>
+              
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Performance Metrics
+                </h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">File Name:</span>
+                    <span className="font-medium text-gray-900 dark:text-white truncate ml-2 max-w-xs">
+                      {downloadStats.videoName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Download Time:</span>
+                    <span className="font-semibold text-blue-600 dark:text-blue-400">
+                      {downloadStats.downloadTime.toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">File Size:</span>
+                    <span className="font-semibold text-blue-600 dark:text-blue-400">
+                      {formatFileSize(downloadStats.fileSize)}
+                    </span>
+                  </div>
+                  <div className="pt-3 border-t border-blue-200 dark:border-blue-700">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 dark:text-gray-400">Download Speed:</span>
+                      <span className="text-xl font-bold text-green-600 dark:text-green-400">
+                        {downloadStats.downloadSpeed.toFixed(2)} MB/s
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
+                      ⚡ Typical AWS S3: 10-50 MB/s • Azure CDN: 20-100 MB/s
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
+                      📦 YouTube: 5-15 MB/s • Google Drive: 10-30 MB/s
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

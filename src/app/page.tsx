@@ -5,6 +5,7 @@ import { useWallet } from "@/components/WalletProvider";
 import { Header } from "@/components/Header";
 import { VideoDownloader } from "@/components/VideoDownloader";
 import { VideoGallery } from "@/components/VideoGallery";
+import { BenchmarkComparison } from "@/components/BenchmarkComparison";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function HomePage() {
@@ -65,33 +66,37 @@ export default function HomePage() {
           <div className="space-y-8">
             <VideoDownloader onUploadSuccess={handleUploadSuccess} />
             <VideoGallery refreshTrigger={refreshGallery} />
+            <BenchmarkComparison />
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+          <div className="space-y-8">
+            <div className="text-center py-12">
+              <div className="max-w-md mx-auto">
+                <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Wallet Connection Required
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  Please connect your wallet to start downloading and storing videos on Shelby.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  This is a demo version. In production, you would connect a real Aptos wallet like{" "}
+                  <a 
+                    href="https://petra.app/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    Petra Wallet
+                  </a>
+                </p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Wallet Connection Required
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Please connect your wallet to start downloading and storing videos on Shelby.
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                This is a demo version. In production, you would connect a real Aptos wallet like{" "}
-                <a 
-                  href="https://petra.app/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  Petra Wallet
-                </a>
-              </p>
             </div>
+            <BenchmarkComparison />
           </div>
         )}
       </main>

@@ -12,6 +12,8 @@ A decentralized YouTube video downloader and storage platform built on Shelby Pr
 - 🌐 **Decentralized** - Videos stored across distributed Shelby network nodes
 - 🎯 **Clean URLs** - Automatically handles YouTube URLs with extra parameters
 - ⏰ **Expiration Management** - Set custom expiration dates for stored videos
+- 📊 **Performance Benchmarking** - Real-time metrics comparing Shelby with AWS/Azure/GCP
+- ⚡ **Speed Analytics** - Track upload/download speeds with detailed breakdowns
 
 ## 🛠️ Technology Stack
 
@@ -143,8 +145,14 @@ Open [http://localhost:3000](http://localhost:3000)
 4. **View Your Videos**
    - All uploaded videos appear in the gallery
    - Click **Preview** to watch inline
-   - Click **Download** to download from Shelby network
+   - Click **Download** to download from Shelby network (with speed metrics)
    - Click the explorer icon to view on Shelby Explorer
+
+5. **Performance Metrics**
+   - View real-time upload/download speeds
+   - Compare with AWS S3, Azure, Google Cloud
+   - See detailed timing breakdowns
+   - Understand trade-offs between Web2 and Web3 storage
 
 ## 📖 Project Structure
 
@@ -165,6 +173,7 @@ SkyStorage/
 │   │   ├── Header.tsx              # Navigation with network warning
 │   │   ├── VideoDownloader.tsx     # Download & upload interface
 │   │   ├── VideoGallery.tsx        # Video management & preview
+│   │   ├── BenchmarkComparison.tsx # Performance comparison table
 │   │   ├── WalletProvider.tsx      # Petra wallet integration
 │   │   └── WalletInstallModal.tsx  # Wallet install prompt
 │   ├── hooks/
@@ -242,6 +251,33 @@ pip install --upgrade yt-dlp
 - `GET /api/video-info` - Get video metadata
 - `GET /api/get-file` - Retrieve downloaded file
 - `GET /api/list-videos` - Query videos from blockchain
+
+## 📊 Performance Benchmarking
+
+SkyStorage includes comprehensive benchmarking to compare Shelby Protocol with traditional cloud providers:
+
+### Upload Metrics
+- YouTube download time
+- Shelby upload time (including erasure coding and blockchain transaction)
+- Total processing time
+- Upload speed (MB/s)
+
+### Download Metrics
+- Download time from Shelby network
+- Download speed (MB/s)
+- Real-time comparison with AWS S3, Azure CDN, YouTube, Google Drive
+
+### Service Comparison
+View detailed comparison table showing:
+- **Shelby Protocol**: Decentralized, permanent, blockchain-verified storage
+- **AWS S3**: 5-25 MB/s upload, 10-50 MB/s download
+- **Azure Blob**: 10-30 MB/s upload, 20-100 MB/s download
+- **Google Cloud**: 15-40 MB/s upload, 25-120 MB/s download
+- **Cloudflare R2**: 20-50 MB/s upload, 30-150 MB/s download
+
+**Key Insight**: While Shelby may have higher latency due to blockchain transactions and erasure coding, it provides unique benefits: permanence, censorship resistance, and cryptographic verification that Web2 services cannot match.
+
+See [BENCHMARKING.md](./docs/BENCHMARKING.md) for detailed documentation.
 
 ## 🧪 Development
 
