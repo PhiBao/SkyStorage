@@ -6,8 +6,8 @@ import { Toaster } from '@/components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'YouTube to Shelby - Decentralized Video Storage',
-  description: 'Download YouTube videos and store them on Shelby decentralized storage network',
+  title: 'SkyStorage - Decentralized File Storage',
+  description: 'Upload and store any file on Shelby decentralized storage network with blockchain verification',
 }
 
 export default function RootLayout({

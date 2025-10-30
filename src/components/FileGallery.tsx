@@ -106,13 +106,13 @@ export function FileGallery({ refreshTrigger }: VideoGalleryProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Play className="w-5 h-5" />
-            Your Videos
+            Your Files
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              Please connect your wallet to view your stored videos
+              Please connect your wallet to view your stored files
             </p>
           </div>
         </CardContent>
@@ -125,7 +125,7 @@ export function FileGallery({ refreshTrigger }: VideoGalleryProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Play className="w-5 h-5" />
-          Your Videos on Shelby
+          Your Files on Shelby
           {videos.length > 0 && (
             <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-2 py-1 rounded-full">
               {videos.length}
@@ -154,10 +154,10 @@ export function FileGallery({ refreshTrigger }: VideoGalleryProps) {
               <Play className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No videos found
+              No files found
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              Download and upload some YouTube videos to see them here
+              Upload some files to see them here
             </p>
           </div>
         ) : (

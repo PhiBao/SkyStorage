@@ -1,7 +1,7 @@
 {
-  "name": "youtube-shelby-downloader",
+  "name": "skystorage",
   "version": "1.0.0",
-  "description": "Download YouTube videos and upload them to Shelby decentralized storage",
+  "description": "Decentralized file storage on Shelby Protocol with blockchain verification",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

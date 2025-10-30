@@ -73,7 +73,7 @@ export function Header() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">SkyStorage</h1>
-              <p className="text-sm text-gray-600">YouTube to Shelby Storage</p>
+              <p className="text-sm text-gray-600">Decentralized File Storage</p>
             </div>
           </div>
           
