@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AccountAddress, Network } from '@aptos-labs/ts-sdk';
 import { ShelbyClient } from '@shelby-protocol/sdk/browser';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

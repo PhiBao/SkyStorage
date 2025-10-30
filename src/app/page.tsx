@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useWallet } from "@/components/WalletProvider";
 import { Header } from "@/components/Header";
-import { VideoDownloader } from "@/components/VideoDownloader";
-import { VideoGallery } from "@/components/VideoGallery";
+import { FileUploader } from "@/components/FileUploader";
+import { FileGallery } from "@/components/FileGallery";
 import { BenchmarkComparison } from "@/components/BenchmarkComparison";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -23,10 +23,10 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            YouTube to Shelby
+            SkyStorage
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
-            Download YouTube videos and store them on Shelby&apos;s decentralized network
+            Decentralized file storage on Shelby blockchain
           </p>
           <div className="max-w-3xl mx-auto">
             <Card>
@@ -37,7 +37,7 @@ export default function HomePage() {
                       1
                     </div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      Connect your wallet (Demo mode for testing)
+                      Connect your Petra wallet to Shelbynet
                     </p>
                   </div>
                   <div className="flex items-center gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -45,7 +45,7 @@ export default function HomePage() {
                       2
                     </div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      Paste a YouTube URL and download the video
+                      Upload any file: documents, images, videos, audio, and more
                     </p>
                   </div>
                   <div className="flex items-center gap-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -53,7 +53,7 @@ export default function HomePage() {
                       3
                     </div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      Upload to Shelby for permanent decentralized storage
+                      Files are stored permanently on Shelby's decentralized network
                     </p>
                   </div>
                 </div>
@@ -64,8 +64,8 @@ export default function HomePage() {
 
         {connected ? (
           <div className="space-y-8">
-            <VideoDownloader onUploadSuccess={handleUploadSuccess} />
-            <VideoGallery refreshTrigger={refreshGallery} />
+            <FileUploader onUploadSuccess={handleUploadSuccess} />
+            <FileGallery refreshTrigger={refreshGallery} />
             <BenchmarkComparison />
           </div>
         ) : (

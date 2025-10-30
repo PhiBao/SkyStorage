@@ -20,7 +20,7 @@ interface VideoGalleryProps {
   refreshTrigger?: number;
 }
 
-export function VideoGallery({ refreshTrigger }: VideoGalleryProps) {
+export function FileGallery({ refreshTrigger }: VideoGalleryProps) {
   const { account } = useWallet();
   const [videos, setVideos] = useState<VideoBlob[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,6 +92,12 @@ export function VideoGallery({ refreshTrigger }: VideoGalleryProps) {
     return videoId 
       ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
       : "/placeholder-video.jpg";
+  };
+
+  const isVideoFile = (filename: string) => {
+    const videoExtensions = ['.mp4', '.webm', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.m4v', '.mpg', '.mpeg'];
+    const lowerFilename = filename.toLowerCase();
+    return videoExtensions.some(ext => lowerFilename.endsWith(ext));
   };
 
   if (!account) {
@@ -196,16 +202,18 @@ export function VideoGallery({ refreshTrigger }: VideoGalleryProps) {
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 text-xs"
-                      onClick={() => setPreviewVideo(video.downloadUrl)}
-                      disabled={video.isExpired}
-                    >
-                      <Eye className="w-3 h-3 mr-1" />
-                      Preview
-                    </Button>
+                    {isVideoFile(video.name) && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 text-xs"
+                        onClick={() => setPreviewVideo(video.downloadUrl)}
+                        disabled={video.isExpired}
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        Preview
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"

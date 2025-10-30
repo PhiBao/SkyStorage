@@ -106,7 +106,7 @@ export function Header() {
                       <div>
                         <p className="text-xs text-gray-500">Connected with {walletName}</p>
                         <p className="text-sm font-mono font-medium text-gray-900">
-                          {account.slice(0, 6)}...{account.slice(-4)}
+                          {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : ''}
                         </p>
                       </div>
                     </div>
