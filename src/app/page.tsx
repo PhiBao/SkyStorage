@@ -53,7 +53,7 @@ export default function HomePage() {
                       3
                     </div>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      Files are stored permanently on Shelby's decentralized network
+                      Files are stored on Shelby's decentralized network for a selected duration (default 30 days). Storage is provided by Shelby nodes and may incur usage fees—you can choose how long to store when uploading.
                     </p>
                   </div>
                 </div>

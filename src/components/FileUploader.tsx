@@ -18,6 +18,8 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [expirationSelection, setExpirationSelection] = useState<string>("30");
+  const [customExpiration, setCustomExpiration] = useState<number>(30);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
@@ -80,7 +82,7 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
 
     const startTime = performance.now();
 
-    try {
+  try {
       // Read file as Uint8Array
       setUploadProgress(20);
       const arrayBuffer = await selectedFile.arrayBuffer();
@@ -89,10 +91,13 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
       setUploadProgress(40);
 
       // Upload to Shelby
+      // determine expiration days from selection/custom
+      const expirationDays = expirationSelection === 'custom' ? Math.max(1, customExpiration) : parseInt(expirationSelection || '30', 10);
+
       const result = await uploadToShelby(
         fileData,
         selectedFile.name,
-        30 // 30 days expiration
+        expirationDays
       );
 
       const endTime = performance.now();
@@ -253,15 +258,47 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
             )}
 
             {selectedFile && (
-              <Button
-                onClick={handleUpload}
-                disabled={!account || isUploading}
-                className="w-full"
-                size="lg"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                {isUploading ? "Uploading..." : "Upload to Shelby"}
-              </Button>
+              <>
+                <div className="flex items-center justify-between gap-4 p-2">
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm text-gray-700 dark:text-gray-300">Storage duration</label>
+                    <select
+                      value={expirationSelection}
+                      onChange={(e) => setExpirationSelection(e.target.value)}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                      <option value="30">30 days (default)</option>
+                      <option value="90">90 days</option>
+                      <option value="180">180 days</option>
+                      <option value="365">365 days</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                    {expirationSelection === 'custom' && (
+                      <input
+                        type="number"
+                        min={1}
+                        value={customExpiration}
+                        onChange={(e) => setCustomExpiration(parseInt(e.target.value || '30', 10))}
+                        className="w-24 border rounded px-2 py-1 text-sm"
+                        aria-label="Custom storage days"
+                      />
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Storage may incur fees. You can choose how long to keep the file.
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleUpload}
+                  disabled={!account || isUploading}
+                  className="w-full"
+                  size="lg"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {isUploading ? "Uploading..." : "Upload to Shelby"}
+                </Button>
+              </>
             )}
           </>
         )}
@@ -298,7 +335,12 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
                     Successfully uploaded to Shelby!
                   </h3>
                   <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                    Your file has been stored on the decentralized network for 30 days.
+                    Your file has been stored on the decentralized network for {/** show chosen expiration */}
+                    {(() => {
+                      const days = expirationSelection === 'custom' ? Math.max(1, customExpiration) : parseInt(expirationSelection || '30', 10);
+                      return `${days} day${days > 1 ? 's' : ''}`;
+                    })()}.
+                    Storage may incur fees and must be renewed or re-uploaded after expiration.
                   </p>
                 </div>
               </div>
